@@ -54,6 +54,6 @@ All three versions return a cyclical component of length T; the first two entrie
 
 ## Contact
 
-Yves Schüler, Deutsche Bundesbank — yves.schueler@bundesbank.de
+Yves Schüler, Deutsche Bundesbank — yves.schueler (at) bundesbank.de
 
 The views expressed are those of the authors and do not necessarily coincide with the views of the Deutsche Bundesbank or the Eurosystem.
