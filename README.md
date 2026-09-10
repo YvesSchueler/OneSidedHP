@@ -34,14 +34,14 @@ Output: the adjusted cyclical component, and the parameters `lm_1` and `kappa` u
 **Python**
 ```python
 from adj1s_hpfilter import adj1s_hpfilter
-ycycle_adj, lm_1, kappa = adj1s_hpfilter(y, 1600, opt=False)   # polynomial adjustment (fast)
+ycycle_adj, lm_1, kappa = adj1s_hpfilter(y, 1600)              # polynomial adjustment (fast)
 ycycle_adj, lm_1, kappa = adj1s_hpfilter(y, 1600, opt=True)    # adjustment by optimization
 ```
 
 **R**
 ```r
 source("adj1s_hpfilter.R")
-res <- adj1s_hpfilter(y, 1600, opt=FALSE)   # polynomial adjustment (fast)
+res <- adj1s_hpfilter(y, 1600)             # polynomial adjustment (fast)
 res$ycycle_adj; res$lm_1; res$kappa
 ```
 
@@ -50,7 +50,7 @@ Options:
 - `opt`: if true, λ₁ and κ are found by minimizing the distance between the power transfer functions of HP-1s and HP-2s (evaluated on a 1,000-observation filter weight vector); otherwise they are read from the fitted polynomials. The two routes give nearly identical values for λ₂ in the range covered by the polynomials. Optimization takes roughly a minute.
 - `sample` (Python and R only): if true, the optimization evaluates the transfer function at the actual sample length instead of 1,000. Useful for large λ₂ combined with short samples (e.g. λ₂ = 400,000 and T < 100).
 
-Note on output length: the MATLAB version returns a vector of length T with the first two entries set to zero; the Python and R versions return a vector of length T − 2, starting at the third observation.
+All three versions return a cyclical component of length T; the first two entries are zero, since the filter needs at least three observations. Defaults are `lm_2 = 1600` and `opt` off in all three versions.
 
 ## Contact
 

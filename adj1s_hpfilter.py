@@ -1,21 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri May  5 13:41:37 2023
-
-@author: elias
-"""
-
-
-import numpy as np
-from scipy.optimize import minimize
-
-
-"""
  Code for "On adjusting the one-sided Hodrick-Prescott filter" (2020) 
  by Elias Wolf (FU-Berlin), Frieder Mokinski (Deutsche Bundesbank), and
  Yves Schüler (Deutsche Bundesbank)
 
- Version date 2023/05/04
+ Version date 2026/09/10
  If you encounter any bug, please mail Yves Schüler at yves.schueler (at) bundesbank.de
 
  This program estimates the cyclical component of the adjusted one-sided HP
@@ -49,21 +38,22 @@ from scipy.optimize import minimize
                    one-sided HP filter is rescaled
 
        Example:
-                   ycycle_adj, lm_1, kappa = adj1s_hpfilter(y,1600)
+                   ycycle_adj, lm_1, kappa = adj1s_hpfilter(y, 1600)
                    yields a Tx1 vector of the extracted cyclical component
                    using a smoothing parameter of 650 and scaling
                    parameter of size 1.1513 for the one-sided HP filter
                   
 """
 
+import numpy as np
+from scipy.optimize import minimize
 
 
-
-def adj1s_hpfilter(y, lm_2, opt=True, sample=False):
+def adj1s_hpfilter(y, lm_2=1600, opt=False, sample=False):
     
-    if isinstance(y, (np.ndarray)) == False:
-        
-        y = np.array(y)
+    y = np.asarray(y, dtype=float)
+    if y.ndim == 2 and y.shape[1] == 1:
+        y = y[:, 0]
     
     if len(y) == 0:
 
@@ -137,8 +127,7 @@ def adj1s_hpfilter(y, lm_2, opt=True, sample=False):
     
         # Initial values and optimization of the cost function
         init_vals = np.asarray([poly_lm(lm_2), poly_kappa(lm_2)])
-        res = minimize(ptf_cost, init_vals, args=(lm_2, T_eff), method='BFGS',
-                       options={'disp': True})
+        res = minimize(ptf_cost, init_vals, args=(lm_2, T_eff), method='BFGS')
     
         # Collect optimal parameters
         lm_1 = res.x[0]
@@ -147,25 +136,22 @@ def adj1s_hpfilter(y, lm_2, opt=True, sample=False):
     
     def hp_one(lm_1, kappa, y):
 
-        y = np.asarray(y)
-        T_series =  len(y)
-        cycle_os = []
+        T_series = len(y)
+        cycle_os = np.zeros(T_series)   # first two observations remain zero
 
-        for i in range(3,T_series+1):
-            
+        for i in range(3, T_series+1):
+
             I = np.eye(i)
             Q_t = np.diff(I, 2, axis=0)
             A_inv = np.linalg.inv(I + lm_1*np.dot(Q_t.T, Q_t))
-            
-            psi_t = y[i-1] - A_inv[-1,:].dot(y[:i])
-            
-            cycle_os.append(psi_t)
 
-        return(kappa*np.asarray(cycle_os))
+            cycle_os[i-1] = y[i-1] - A_inv[-1,:].dot(y[:i])
+
+        return kappa*cycle_os
     
     # Apply the one-sided HP-Filter to the series
     ycycle_adj = hp_one(lm_1, kappa, y)
 
-    return([ycycle_adj, lm_1, kappa])
+    return ycycle_adj, lm_1, kappa
 
 

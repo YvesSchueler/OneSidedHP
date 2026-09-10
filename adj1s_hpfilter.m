@@ -2,10 +2,10 @@ function [ ycycle_adj, lm_1, kappa ] = adj1s_hpfilter(y,lm_2,opt)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Code for "On adjusting the one-sided Hodrick-Prescott filter" (2020) 
 % by Elias Wolf (FU-Berlin), Frieder Mokinski (Deutsche Bundesbank), and
-% Yves Schüler (Deutsche Bundesbank)
+% Yves SchÃ¼ler (Deutsche Bundesbank)
 %
-% Version date 2022/01/14
-% If you encounter any bug, please mail Yves Schüler at yves.schueler (at) bundesbank.de
+% Version date 2026/09/10
+% If you encounter any bug, please mail Yves SchÃ¼ler at yves.schueler (at) bundesbank.de
 %
 % This program estimates the cyclical component of the adjusted one-sided HP
 % filter (HP-1s*) by estimating the two-sided HP filter (HP-2s) on an expanding sample and keeping the last observation.

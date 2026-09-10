@@ -4,7 +4,7 @@
 # by Elias Wolf (FU-Berlin), Frieder Mokinski (Deutsche Bundesbank), and
 # Yves Schüler (Deutsche Bundesbank)
 
-# Version date 2023/05/04
+# Version date 2026/09/10
 # If you encounter any bug, please mail Yves Schüler at yves.schueler (at) bundesbank.de
 
 # This program estimates the cyclical component of the adjusted one-sided HP
@@ -30,7 +30,8 @@
 #                   lm_2 = 400,000 and T < 100. 
 #
 #      Output:  
-#                   ycycle_adj  - a Tx1 vector with the adjusted extracted cyclical component
+#                   ycycle_adj  - a Tx1 vector with the adjusted extracted cyclical component.
+#                   The first two entries are set to zero (the filter needs at least three observations).
 #                  
 #                   lm_1        - a scalar. This is the adjusted value of the smoothing parameter used as an input to the one-sided HP filter
 #
@@ -38,25 +39,27 @@
 #                   one-sided HP filter is rescaled
 #
 #       Example:
-#                   ycycle_adj, lm_1, kappa = adj1s_hpfilter(y,1600)
+#                   res <- adj1s_hpfilter(y, 1600); res$ycycle_adj; res$lm_1; res$kappa
 #                   yields a Tx1 vector of the extracted cyclical component
 #                   using a smoothing parameter of 650 and scaling
 #                   parameter of size 1.1513 for the one-sided HP filter
 ################################################################################                  
 
 
-adj1s_hpfilter <- function(y, lm_2, opt=TRUE, sample=FALSE){
+adj1s_hpfilter <- function(y, lm_2=1600, opt=FALSE, sample=FALSE){
   
+  if (!is.null(dim(y))) {
+    if (length(dim(y)) > 1 && dim(y)[2] > 1){
+      stop("y contains more than one time series: the program is designed for one series only")
+    }
+    y <- as.numeric(y)
+  }
   if (is.numeric(y) == FALSE){
-    y = as.numeric(y)
+    y <- as.numeric(y)
   }
   
   if (length(y) == 0){
     stop("Time series is missing or empty")
-  }
-
-  if (length(dim(y)) > 1){
-    stop("y contains more than one time series: the program is designed for one series only")
   }
       
   if (length(y) < 3){
@@ -153,7 +156,7 @@ adj1s_hpfilter <- function(y, lm_2, opt=TRUE, sample=FALSE){
   # Apply the one-sided HP-Filter to the series
   ycycle_adj = hp_one(lm_1, kappa, y)
     
-  f_out <- list("ycycle_adj" = ycycle_adj[3:length(ycycle_adj)],
+  f_out <- list("ycycle_adj" = ycycle_adj,   # length T, first two entries zero
                 "lm_1" = lm_1,
                 "kappa" = kappa)
   return(f_out)
